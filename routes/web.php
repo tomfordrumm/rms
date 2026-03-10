@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DishController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -10,6 +12,14 @@ Route::inertia('/', 'Welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('restaurant.required')->group(function () {
         Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::resource('categories', CategoryController::class)
+                ->except('show');
+
+            Route::resource('dishes', DishController::class)
+                ->except('show');
+        });
     });
 });
 

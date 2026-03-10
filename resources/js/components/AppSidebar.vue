@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Store } from 'lucide-vue-next';
+import { BookOpen, FolderGit2, LayoutGrid, Salad, Store, Tags } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,6 +15,8 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as categoriesIndex } from '@/routes/admin/categories';
+import { index as dishesIndex } from '@/routes/admin/dishes';
 import { edit as editRestaurant } from '@/routes/restaurant';
 import type { NavItem } from '@/types';
 
@@ -28,6 +30,16 @@ const mainNavItems: NavItem[] = [
         title: 'Restaurant settings',
         href: editRestaurant(),
         icon: Store,
+    },
+    {
+        title: 'Categories',
+        href: categoriesIndex(),
+        icon: Tags,
+    },
+    {
+        title: 'Dishes',
+        href: dishesIndex(),
+        icon: Salad,
     },
 ];
 
