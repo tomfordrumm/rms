@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,13 +37,35 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $restaurant = $user?->primaryRestaurant();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'restaurant' => $this->shareRestaurant($restaurant),
+                'hasRestaurant' => $user?->hasRestaurant() ?? false,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function shareRestaurant(?Restaurant $restaurant): ?array
+    {
+        if ($restaurant === null) {
+            return null;
+        }
+
+        return [
+            'id' => $restaurant->id,
+            'name' => $restaurant->name,
+            'slug' => $restaurant->slug,
+            'logo_url' => $restaurant->logo_path ? Storage::disk('public')->url($restaurant->logo_path) : null,
         ];
     }
 }

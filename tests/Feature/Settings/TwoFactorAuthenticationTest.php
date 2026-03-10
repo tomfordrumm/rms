@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Settings;
 
+use App\Models\Restaurant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -24,6 +25,8 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
 
         $user = User::factory()->create();
+        $restaurant = Restaurant::factory()->create();
+        $user->restaurants()->attach($restaurant);
 
         $this->actingAs($user)
             ->withSession(['auth.password_confirmed_at' => time()])
@@ -41,6 +44,8 @@ class TwoFactorAuthenticationTest extends TestCase
         }
 
         $user = User::factory()->create();
+        $restaurant = Restaurant::factory()->create();
+        $user->restaurants()->attach($restaurant);
 
         Features::twoFactorAuthentication([
             'confirm' => true,
@@ -60,6 +65,8 @@ class TwoFactorAuthenticationTest extends TestCase
         }
 
         $user = User::factory()->create();
+        $restaurant = Restaurant::factory()->create();
+        $user->restaurants()->attach($restaurant);
 
         Features::twoFactorAuthentication([
             'confirm' => true,
@@ -83,6 +90,8 @@ class TwoFactorAuthenticationTest extends TestCase
         config(['fortify.features' => []]);
 
         $user = User::factory()->create();
+        $restaurant = Restaurant::factory()->create();
+        $user->restaurants()->attach($restaurant);
 
         $this->actingAs($user)
             ->withSession(['auth.password_confirmed_at' => time()])

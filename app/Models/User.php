@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -57,5 +58,23 @@ class User extends Authenticatable
     public function restaurants(): BelongsToMany
     {
         return $this->belongsToMany(Restaurant::class);
+    }
+
+    public function primaryRestaurant(): ?Restaurant
+    {
+        if ($this->relationLoaded('restaurants') && $this->restaurants instanceof Collection) {
+            return $this->restaurants->first();
+        }
+
+        return $this->restaurants()->first();
+    }
+
+    public function hasRestaurant(): bool
+    {
+        if ($this->relationLoaded('restaurants') && $this->restaurants instanceof Collection) {
+            return $this->restaurants->isNotEmpty();
+        }
+
+        return $this->restaurants()->exists();
     }
 }

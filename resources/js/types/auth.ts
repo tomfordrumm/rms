@@ -9,8 +9,17 @@ export type User = {
     [key: string]: unknown;
 };
 
+export type AuthRestaurant = {
+    id: number;
+    name: string;
+    slug: string;
+    logo_url: string | null;
+};
+
 export type Auth = {
     user: User;
+    restaurant: AuthRestaurant | null;
+    hasRestaurant: boolean;
 };
 
 export type TwoFactorConfigContent = {

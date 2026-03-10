@@ -7,11 +7,24 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
+import { edit as editRestaurant } from '@/routes/restaurant';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
 
+type Props = {
+    fullWidth?: boolean;
+};
+
+withDefaults(defineProps<Props>(), {
+    fullWidth: false,
+});
+
 const sidebarNavItems: NavItem[] = [
+    {
+        title: 'Restaurant',
+        href: editRestaurant(),
+    },
     {
         title: 'Profile',
         href: editProfile(),
@@ -66,8 +79,8 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 
             <Separator class="my-6 lg:hidden" />
 
-            <div class="flex-1 md:max-w-2xl">
-                <section class="max-w-xl space-y-12">
+            <div :class="fullWidth ? 'flex-1 min-w-0' : 'flex-1 md:max-w-2xl'">
+                <section :class="fullWidth ? 'w-full space-y-12' : 'max-w-xl space-y-12'">
                     <slot />
                 </section>
             </div>
