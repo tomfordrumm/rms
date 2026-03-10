@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
+use App\Http\Controllers\Admin\RestaurantTableController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -18,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->except('show');
 
             Route::resource('dishes', DishController::class)
+                ->except('show');
+
+            Route::resource('tables', RestaurantTableController::class)
                 ->except('show');
         });
     });
