@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
+use App\Http\Controllers\RestaurantMenuController;
 use App\Http\Controllers\Admin\ReservationController;
 use App\Http\Controllers\Admin\RestaurantTableController;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,9 @@ use Laravel\Fortify\Features;
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
+
+Route::get('/r/{slug}/menu', RestaurantMenuController::class)
+    ->name('restaurants.menu');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('restaurant.required')->group(function () {
