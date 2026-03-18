@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
+use App\Http\Controllers\MagicOrderController;
 use App\Http\Controllers\RestaurantMenuController;
 use App\Http\Controllers\Admin\ReservationController;
 use App\Http\Controllers\Admin\RestaurantTableController;
@@ -14,6 +15,9 @@ Route::inertia('/', 'Welcome', [
 
 Route::get('/r/{slug}/menu', RestaurantMenuController::class)
     ->name('restaurants.menu');
+Route::post('/r/{slug}/magic-order', MagicOrderController::class)
+    ->middleware('throttle:5,1')
+    ->name('restaurants.magic-order');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('restaurant.required')->group(function () {

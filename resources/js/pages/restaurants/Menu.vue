@@ -5,13 +5,20 @@ import { computed, ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import {
     Sheet,
     SheetContent,
     SheetDescription,
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { Clock3, Minus, Plus, ShoppingBag, Sparkles, Trash2 } from 'lucide-vue-next';
+import { Clock3, Minus, Plus, Sparkles, ShoppingBag, Stars, Trash2, WandSparkles } from 'lucide-vue-next';
 
 type RestaurantPayload = {
     slug: string;
@@ -44,6 +51,12 @@ type CartItem = DishPayload & {
     quantity: number;
 };
 
+type MagicOrderItem = DishPayload & {
+    dish_id: number;
+    quantity: number;
+    reason: string;
+};
+
 const props = defineProps<{
     restaurant: RestaurantPayload;
     categories: CategoryPayload[];
@@ -51,6 +64,14 @@ const props = defineProps<{
 
 const selectedCategoryId = ref<number | null>(null);
 const isCartOpen = ref(false);
+const isMagicOrderOpen = ref(false);
+const isMagicOrderLoading = ref(false);
+const magicOrderPreferences = ref('');
+const magicOrderError = ref<string | null>(null);
+const magicOrderResult = ref<{
+    summary: string;
+    items: MagicOrderItem[];
+} | null>(null);
 const workingHoursPrimary = computed(() => props.restaurant.work_hours?.trim() || null);
 const workingHoursRange = computed(() => {
     if (!props.restaurant.open_time || !props.restaurant.close_time) {
@@ -123,17 +144,111 @@ const cartSubtotal = computed(() =>
 );
 
 function addToCart(dish: DishPayload): void {
-    const existingItem = cartItems.value.find((item) => item.id === dish.id);
-
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cartItems.value = [...cartItems.value, { ...dish, quantity: 1 }];
-    }
-
+    mergeCartItems([{ ...dish, quantity: 1 }]);
     isCartOpen.value = true;
 }
 
+function mergeCartItems(itemsToMerge: Array<DishPayload & { quantity: number }>): void {
+    const nextItems = [...cartItems.value];
+
+    for (const incomingItem of itemsToMerge) {
+        const existingItem = nextItems.find((item) => item.id === incomingItem.id);
+
+        if (existingItem) {
+            existingItem.quantity += incomingItem.quantity;
+            continue;
+        }
+
+        nextItems.push({ ...incomingItem });
+    }
+
+    cartItems.value = nextItems;
+}
+
+function openMagicOrder(): void {
+    isMagicOrderOpen.value = true;
+    magicOrderError.value = null;
+    magicOrderResult.value = null;
+}
+
+function closeMagicOrder(): void {
+    isMagicOrderOpen.value = false;
+    isMagicOrderLoading.value = false;
+    magicOrderError.value = null;
+    magicOrderResult.value = null;
+}
+
+async function submitMagicOrder(): Promise<void> {
+    if (magicOrderPreferences.value.trim() === '' || isMagicOrderLoading.value) {
+        return;
+    }
+
+    isMagicOrderLoading.value = true;
+    magicOrderError.value = null;
+    magicOrderResult.value = null;
+
+    try {
+        const csrfToken =
+            document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+
+        const response = await fetch(`/r/${props.restaurant.slug}/magic-order`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({
+                preferences: magicOrderPreferences.value.trim(),
+            }),
+        });
+
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+            if (payload?.errors?.preferences?.[0]) {
+                magicOrderError.value = payload.errors.preferences[0] as string;
+            } else if (payload?.message) {
+                magicOrderError.value = payload.message as string;
+            } else {
+                magicOrderError.value = 'Magic order is unavailable right now.';
+            }
+
+            return;
+        }
+
+        magicOrderResult.value = payload as {
+            summary: string;
+            items: MagicOrderItem[];
+        };
+    } catch {
+        magicOrderError.value = 'Magic order is unavailable right now.';
+    } finally {
+        isMagicOrderLoading.value = false;
+    }
+}
+
+function addMagicOrderToCart(): void {
+    if (!magicOrderResult.value) {
+        return;
+    }
+
+    mergeCartItems(
+        magicOrderResult.value.items.map((item) => ({
+            id: item.dish_id,
+            name: item.name,
+            description: item.description,
+            weight: item.weight,
+            price: item.price,
+            image_url: item.image_url,
+            quantity: item.quantity,
+        })),
+    );
+
+    closeMagicOrder();
+    isCartOpen.value = true;
+}
 function updateQuantity(dishId: number, nextQuantity: number): void {
     if (nextQuantity <= 0) {
         removeFromCart(dishId);
@@ -165,6 +280,151 @@ function removeFromCart(dishId: number): void {
         class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(196,168,120,0.25),_transparent_28%),linear-gradient(180deg,_#f7f2e8_0%,_#efe6d8_36%,_#fbfaf8_100%)] text-slate-900"
         style="font-family: 'Manrope', var(--font-sans)"
     >
+        <Dialog :open="isMagicOrderOpen" @update:open="(open) => (open ? openMagicOrder() : closeMagicOrder())">
+            <DialogContent
+                class="max-h-[90vh] max-w-2xl overflow-y-auto rounded-[2rem] border-stone-200 bg-[#faf6ef] p-0 shadow-[0_40px_120px_-60px_rgba(15,23,42,0.65)]"
+            >
+                <DialogHeader class="border-b border-stone-200/80 px-6 py-6 text-left sm:px-8">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex size-11 items-center justify-center rounded-full bg-[#12192b] text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.85)]"
+                        >
+                            <WandSparkles class="size-5" />
+                        </div>
+                        <div>
+                            <DialogTitle
+                                class="text-2xl tracking-[-0.03em] text-slate-950"
+                                style="font-family: 'Cormorant Garamond', ui-serif, Georgia, serif"
+                            >
+                                Magic order
+                            </DialogTitle>
+                            <DialogDescription class="text-slate-500">
+                                Tell us what you want and we will assemble a menu suggestion for you.
+                            </DialogDescription>
+                        </div>
+                    </div>
+                </DialogHeader>
+
+                <div class="space-y-6 px-6 py-6 sm:px-8 sm:py-8">
+                    <div
+                        v-if="magicOrderResult"
+                        class="space-y-5"
+                    >
+                        <div class="rounded-[1.5rem] border border-stone-200 bg-white p-5 shadow-[0_20px_50px_-40px_rgba(15,23,42,0.35)]">
+                            <div class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+                                <Stars class="size-4 text-emerald-500" />
+                                Why this set works
+                            </div>
+                            <p class="text-sm leading-7 text-slate-700">
+                                {{ magicOrderResult.summary }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <article
+                                v-for="item in magicOrderResult.items"
+                                :key="item.dish_id"
+                                class="rounded-[1.5rem] border border-stone-200 bg-white p-5 shadow-[0_20px_50px_-40px_rgba(15,23,42,0.35)]"
+                            >
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="min-w-0">
+                                        <h3 class="text-lg font-semibold text-slate-950">
+                                            {{ item.name }}
+                                        </h3>
+                                        <p class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-400">
+                                            {{ item.weight }} · Qty {{ item.quantity }}
+                                        </p>
+                                    </div>
+                                    <span class="shrink-0 text-lg font-extrabold text-emerald-600">
+                                        {{ formatPrice(item.price) }}
+                                    </span>
+                                </div>
+
+                                <p
+                                    v-if="item.reason"
+                                    class="mt-4 text-sm leading-6 text-slate-600"
+                                >
+                                    {{ item.reason }}
+                                </p>
+                            </article>
+                        </div>
+
+                        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                class="rounded-full"
+                                @click="closeMagicOrder()"
+                            >
+                                Отмена
+                            </Button>
+                            <Button
+                                type="button"
+                                class="rounded-full bg-[#12192b] text-white hover:bg-[#182038]"
+                                @click="addMagicOrderToCart()"
+                            >
+                                Добавить всё в корзину
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else
+                        class="space-y-5"
+                    >
+                        <div class="space-y-3">
+                            <label
+                                for="magic-order-preferences"
+                                class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500"
+                            >
+                                Preferences and restrictions
+                            </label>
+                            <textarea
+                                id="magic-order-preferences"
+                                v-model="magicOrderPreferences"
+                                class="min-h-40 w-full rounded-[1.5rem] border border-stone-200 bg-white px-5 py-4 text-sm leading-6 text-slate-700 shadow-[0_20px_50px_-40px_rgba(15,23,42,0.35)] outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                placeholder="Например: хочу легкий ужин без красного мяса, люблю морепродукты, острое не хочу, на двоих."
+                            />
+                        </div>
+
+                        <div
+                            v-if="magicOrderError"
+                            class="rounded-[1.5rem] border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+                        >
+                            {{ magicOrderError }}
+                        </div>
+
+                        <div
+                            v-if="isMagicOrderLoading"
+                            class="rounded-[1.5rem] border border-stone-200 bg-white px-5 py-4 text-sm leading-6 text-slate-600 shadow-[0_20px_50px_-40px_rgba(15,23,42,0.35)]"
+                        >
+                            Собираем рекомендацию по вашему запросу.
+                        </div>
+
+                        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                class="rounded-full"
+                                :disabled="isMagicOrderLoading"
+                                @click="closeMagicOrder()"
+                            >
+                                Отмена
+                            </Button>
+                            <Button
+                                type="button"
+                                class="rounded-full bg-[#12192b] text-white hover:bg-[#182038]"
+                                :disabled="magicOrderPreferences.trim() === '' || isMagicOrderLoading"
+                                @click="submitMagicOrder()"
+                            >
+                                {{ isMagicOrderLoading ? 'Собираем заказ...' : 'Соберите заказ за меня' }}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+
         <Sheet v-model:open="isCartOpen">
             <SheetContent
                 side="right"
@@ -413,6 +673,17 @@ function removeFromCart(dishId: number): void {
                         class="mb-6 flex flex-col gap-5 border-b border-stone-200/80 pb-5 sm:mb-8 lg:flex-row lg:items-end lg:justify-between"
                     >
                         <div class="space-y-4">
+                            <div class="flex justify-start">
+                                <Button
+                                    type="button"
+                                    class="rounded-full bg-[#12192b] px-5 text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.85)] hover:bg-[#182038]"
+                                    @click="openMagicOrder()"
+                                >
+                                    <WandSparkles class="size-4" />
+                                    Magic order
+                                </Button>
+                            </div>
+
                             <div class="flex flex-wrap gap-3">
                                 <button
                                     type="button"
