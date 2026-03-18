@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Salad, Store, Tags, UsersRound } from 'lucide-vue-next';
+import { BookOpen, CalendarRange, FolderGit2, LayoutGrid, Salad, Store, Tags, UsersRound } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,6 +17,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/admin/categories';
 import { index as dishesIndex } from '@/routes/admin/dishes';
+import { index as reservationsIndex } from '@/routes/admin/reservations';
 import { index as tablesIndex } from '@/routes/admin/tables';
 import { edit as editRestaurant } from '@/routes/restaurant';
 import type { NavItem } from '@/types';
@@ -46,6 +47,11 @@ const mainNavItems: NavItem[] = [
         title: 'Tables',
         href: tablesIndex(),
         icon: UsersRound,
+    },
+    {
+        title: 'Reservations',
+        href: reservationsIndex(),
+        icon: CalendarRange,
     },
 ];
 
