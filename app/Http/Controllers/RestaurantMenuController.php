@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\PublicRestaurants\SerializePublicRestaurantAction;
 use App\Models\Category;
 use App\Models\Dish;
 use App\Models\Restaurant;
@@ -11,6 +12,10 @@ use Inertia\Response;
 
 class RestaurantMenuController extends Controller
 {
+    public function __construct(
+        private readonly SerializePublicRestaurantAction $serializeRestaurant,
+    ) {}
+
     public function __invoke(string $slug): Response
     {
         $restaurant = Restaurant::query()
@@ -31,29 +36,12 @@ class RestaurantMenuController extends Controller
             ->get();
 
         return Inertia::render('restaurants/Menu', [
-            'restaurant' => $this->serializeRestaurant($restaurant),
+            'restaurant' => $this->serializeRestaurant->handle($restaurant),
             'categories' => $categories
                 ->map(fn (Category $category): array => $this->serializeCategory($category))
                 ->values()
                 ->all(),
         ]);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function serializeRestaurant(Restaurant $restaurant): array
-    {
-        return [
-            'slug' => $restaurant->slug,
-            'name' => $restaurant->name,
-            'description' => $restaurant->description,
-            'work_hours' => $restaurant->work_hours,
-            'open_time' => $this->trimSeconds($restaurant->open_time),
-            'close_time' => $this->trimSeconds($restaurant->close_time),
-            'logo_url' => $restaurant->logo_path ? Storage::disk('public')->url($restaurant->logo_path) : null,
-            'cover_url' => $restaurant->cover_path ? Storage::disk('public')->url($restaurant->cover_path) : null,
-        ];
     }
 
     /**
@@ -85,14 +73,5 @@ class RestaurantMenuController extends Controller
             'price' => $dish->price,
             'image_url' => $dish->image_path ? Storage::disk('public')->url($dish->image_path) : null,
         ];
-    }
-
-    private function trimSeconds(?string $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return substr($value, 0, 5);
     }
 }

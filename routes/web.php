@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
 use App\Http\Controllers\MagicOrderController;
+use App\Http\Controllers\PublicReservationController;
 use App\Http\Controllers\RestaurantMenuController;
 use App\Http\Controllers\Admin\ReservationController;
 use App\Http\Controllers\Admin\RestaurantTableController;
@@ -18,6 +19,26 @@ Route::get('/r/{slug}/menu', RestaurantMenuController::class)
 Route::post('/r/{slug}/magic-order', MagicOrderController::class)
     ->middleware('throttle:5,1')
     ->name('restaurants.magic-order');
+Route::controller(PublicReservationController::class)
+    ->prefix('/r/{slug}/booking')
+    ->name('restaurants.booking.')
+    ->group(function (): void {
+        Route::get('/', 'showBookingPage')->name('show');
+        Route::get('/availability', 'availability')
+            ->middleware('throttle:30,1')
+            ->name('availability');
+        Route::post('/', 'store')
+            ->middleware('throttle:10,1')
+            ->name('store');
+        Route::get('/success/{token}', 'showSuccess')->name('success');
+        Route::get('/manage/{token}', 'showManage')->name('manage');
+        Route::patch('/manage/{token}', 'update')
+            ->middleware('throttle:10,1')
+            ->name('update');
+        Route::patch('/manage/{token}/cancel', 'cancel')
+            ->middleware('throttle:10,1')
+            ->name('cancel');
+    });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('restaurant.required')->group(function () {

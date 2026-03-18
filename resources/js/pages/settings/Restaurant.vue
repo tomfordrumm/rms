@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
+import { Check, Clock3, ImagePlus, Store, WandSparkles } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,6 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit, store, update } from '@/routes/restaurant';
 import type { BreadcrumbItem } from '@/types';
-import { Check, Clock3, ImagePlus, Store, WandSparkles } from 'lucide-vue-next';
 
 type RestaurantPayload = {
     id: number;
@@ -164,7 +163,8 @@ function slugify(value: string): string {
 }
 
 function updatePreview(file: File | null, kind: 'logo' | 'cover'): void {
-    const currentUrl = kind === 'logo' ? logoPreviewUrl.value : coverPreviewUrl.value;
+    const currentUrl =
+        kind === 'logo' ? logoPreviewUrl.value : coverPreviewUrl.value;
     const originalUrl =
         kind === 'logo'
             ? (props.restaurant?.logo_url ?? null)
@@ -198,7 +198,7 @@ function revokePreview(value: string | null, original: string | null): void {
                     class="relative overflow-hidden rounded-[2rem] border border-border/70 bg-gradient-to-br from-stone-950 via-zinc-900 to-amber-950 px-6 py-8 text-stone-50 shadow-[0_32px_120px_-48px_rgba(17,12,8,0.9)]"
                 >
                     <div
-                        class="absolute -right-16 top-4 h-40 w-40 rounded-full bg-amber-400/15 blur-3xl"
+                        class="absolute top-4 -right-16 h-40 w-40 rounded-full bg-amber-400/15 blur-3xl"
                     />
                     <div
                         class="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-amber-200/50 to-transparent"
@@ -210,7 +210,11 @@ function revokePreview(value: string | null, original: string | null): void {
                             class="border border-white/10 bg-white/10 text-stone-50"
                         >
                             <Store class="mr-2 h-3.5 w-3.5" />
-                            {{ isOnboarding ? 'First-time setup' : 'Restaurant profile' }}
+                            {{
+                                isOnboarding
+                                    ? 'First-time setup'
+                                    : 'Restaurant profile'
+                            }}
                         </Badge>
 
                         <div class="space-y-2">
@@ -223,7 +227,9 @@ function revokePreview(value: string | null, original: string | null): void {
                                         : 'Keep your restaurant details accurate and public-ready'
                                 }}
                             </h1>
-                            <p class="max-w-2xl text-sm leading-6 text-stone-200/80">
+                            <p
+                                class="max-w-2xl text-sm leading-6 text-stone-200/80"
+                            >
                                 {{
                                     isOnboarding
                                         ? 'This is the only required step before the rest of the admin area opens up. Fill in the core profile now and refine it later.'
@@ -232,46 +238,70 @@ function revokePreview(value: string | null, original: string | null): void {
                             </p>
                         </div>
 
-                        <div class="grid gap-3 text-xs text-stone-200/75 md:grid-cols-3">
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                                <div class="mb-2 flex items-center gap-2 text-stone-50">
+                        <div
+                            class="grid gap-3 text-xs text-stone-200/75 md:grid-cols-3"
+                        >
+                            <div
+                                class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                            >
+                                <div
+                                    class="mb-2 flex items-center gap-2 text-stone-50"
+                                >
                                     <WandSparkles class="h-4 w-4" />
                                     Identity
                                 </div>
-                                Name and slug become the foundation of your public presence.
+                                Name and slug become the foundation of your
+                                public presence.
                             </div>
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                                <div class="mb-2 flex items-center gap-2 text-stone-50">
+                            <div
+                                class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                            >
+                                <div
+                                    class="mb-2 flex items-center gap-2 text-stone-50"
+                                >
                                     <ImagePlus class="h-4 w-4" />
                                     Visuals
                                 </div>
-                                Logo and cover make the admin record useful for later menu pages.
+                                Logo and cover make the admin record useful for
+                                later menu pages.
                             </div>
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                                <div class="mb-2 flex items-center gap-2 text-stone-50">
+                            <div
+                                class="rounded-2xl border border-white/10 bg-white/5 p-4"
+                            >
+                                <div
+                                    class="mb-2 flex items-center gap-2 text-stone-50"
+                                >
                                     <Clock3 class="h-4 w-4" />
                                     Schedule
                                 </div>
-                                Add the opening hours you want guests to see first.
+                                Add the opening hours you want guests to see
+                                first.
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div v-if="statusMessage" class="rounded-2xl">
-                    <Alert class="border-emerald-200 bg-emerald-50 text-emerald-900">
+                    <Alert
+                        class="border-emerald-200 bg-emerald-50 text-emerald-900"
+                    >
                         <Check class="h-4 w-4" />
                         <AlertTitle>Saved</AlertTitle>
                         <AlertDescription>{{ statusMessage }}</AlertDescription>
                     </Alert>
                 </div>
 
-                <div class="grid gap-6 xl:grid-cols-[minmax(0,2.2fr)_minmax(22rem,1fr)]">
+                <div
+                    class="grid gap-6 xl:grid-cols-[minmax(0,2.2fr)_minmax(22rem,1fr)]"
+                >
                     <Card class="rounded-[1.75rem] border-border/70 shadow-sm">
                         <CardHeader class="space-y-2">
-                            <CardTitle class="text-xl">Core restaurant settings</CardTitle>
+                            <CardTitle class="text-xl"
+                                >Core restaurant settings</CardTitle
+                            >
                             <CardDescription>
-                                The same screen handles first creation and future edits.
+                                The same screen handles first creation and
+                                future edits.
                             </CardDescription>
                         </CardHeader>
 
@@ -279,20 +309,31 @@ function revokePreview(value: string | null, original: string | null): void {
                             <form class="space-y-8" @submit.prevent="submit">
                                 <section class="grid gap-6 md:grid-cols-2">
                                     <div class="grid gap-2 md:col-span-2">
-                                        <Label for="name">Restaurant name</Label>
+                                        <Label for="name"
+                                            >Restaurant name</Label
+                                        >
                                         <Input
                                             id="name"
                                             v-model="form.name"
                                             placeholder="Casa Atlantica"
                                         />
-                                        <InputError :message="form.errors.name" />
+                                        <InputError
+                                            :message="form.errors.name"
+                                        />
                                     </div>
 
                                     <div class="grid gap-2 md:col-span-2">
-                                        <div class="flex items-center justify-between gap-3">
+                                        <div
+                                            class="flex items-center justify-between gap-3"
+                                        >
                                             <Label for="slug">Slug</Label>
-                                            <span class="text-xs text-muted-foreground">
-                                                Preview: /{{ generatedSlug || 'your-restaurant' }}
+                                            <span
+                                                class="text-xs text-muted-foreground"
+                                            >
+                                                Preview: /{{
+                                                    generatedSlug ||
+                                                    'your-restaurant'
+                                                }}
                                             </span>
                                         </div>
                                         <Input
@@ -301,57 +342,77 @@ function revokePreview(value: string | null, original: string | null): void {
                                             placeholder="auto-generated-from-name"
                                             @focus="slugTouched = true"
                                         />
-                                        <InputError :message="form.errors.slug" />
+                                        <InputError
+                                            :message="form.errors.slug"
+                                        />
                                     </div>
 
                                     <div class="grid gap-2 md:col-span-2">
-                                        <Label for="description">Description</Label>
+                                        <Label for="description"
+                                            >Description</Label
+                                        >
                                         <textarea
                                             id="description"
                                             v-model="form.description"
                                             rows="4"
-                                            class="min-h-28 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
+                                            class="min-h-28 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
                                             placeholder="Short restaurant story, positioning or concept."
                                         />
-                                        <InputError :message="form.errors.description" />
+                                        <InputError
+                                            :message="form.errors.description"
+                                        />
                                     </div>
                                 </section>
 
                                 <section class="grid gap-6 md:grid-cols-2">
                                     <div class="grid gap-2">
-                                        <Label for="open_time">Opening time</Label>
+                                        <Label for="open_time"
+                                            >Opening time</Label
+                                        >
                                         <Input
                                             id="open_time"
                                             v-model="form.open_time"
                                             type="time"
                                         />
-                                        <InputError :message="form.errors.open_time" />
+                                        <InputError
+                                            :message="form.errors.open_time"
+                                        />
                                     </div>
 
                                     <div class="grid gap-2">
-                                        <Label for="close_time">Closing time</Label>
+                                        <Label for="close_time"
+                                            >Closing time</Label
+                                        >
                                         <Input
                                             id="close_time"
                                             v-model="form.close_time"
                                             type="time"
                                         />
-                                        <InputError :message="form.errors.close_time" />
+                                        <InputError
+                                            :message="form.errors.close_time"
+                                        />
                                     </div>
 
                                     <div class="grid gap-2 md:col-span-2">
-                                        <Label for="work_hours">Working hours notes</Label>
+                                        <Label for="work_hours"
+                                            >Working hours notes</Label
+                                        >
                                         <textarea
                                             id="work_hours"
                                             v-model="form.work_hours"
                                             rows="4"
-                                            class="min-h-28 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
+                                            class="min-h-28 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
                                             placeholder="Mon-Fri 12:00-23:00, Sat-Sun 10:00-00:00"
                                         />
-                                        <InputError :message="form.errors.work_hours" />
+                                        <InputError
+                                            :message="form.errors.work_hours"
+                                        />
                                     </div>
 
                                     <div class="grid gap-3 md:col-span-2">
-                                        <div class="flex items-center justify-between gap-3">
+                                        <div
+                                            class="flex items-center justify-between gap-3"
+                                        >
                                             <Label>Closed dates</Label>
                                             <Button
                                                 type="button"
@@ -364,12 +425,16 @@ function revokePreview(value: string | null, original: string | null): void {
                                         </div>
 
                                         <div
-                                            v-for="(date, index) in form.closed_dates"
+                                            v-for="(
+                                                date, index
+                                            ) in form.closed_dates"
                                             :key="`${index}-${date}`"
                                             class="flex items-start gap-3"
                                         >
                                             <Input
-                                                v-model="form.closed_dates[index]"
+                                                v-model="
+                                                    form.closed_dates[index]
+                                                "
                                                 type="date"
                                             />
                                             <Button
@@ -381,7 +446,9 @@ function revokePreview(value: string | null, original: string | null): void {
                                                 Remove
                                             </Button>
                                         </div>
-                                        <InputError :message="form.errors.closed_dates" />
+                                        <InputError
+                                            :message="form.errors.closed_dates"
+                                        />
                                     </div>
                                 </section>
 
@@ -392,10 +459,12 @@ function revokePreview(value: string | null, original: string | null): void {
                                             id="contacts"
                                             v-model="form.contacts"
                                             rows="4"
-                                            class="min-h-28 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
+                                            class="min-h-28 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
                                             placeholder="Phone, email, address or any admin notes you want to keep together."
                                         />
-                                        <InputError :message="form.errors.contacts" />
+                                        <InputError
+                                            :message="form.errors.contacts"
+                                        />
                                     </div>
 
                                     <div class="grid gap-3">
@@ -404,9 +473,16 @@ function revokePreview(value: string | null, original: string | null): void {
                                             id="logo"
                                             type="file"
                                             accept=".png,.jpg,.jpeg,.webp"
-                                            @input="form.logo = ($event.target as HTMLInputElement).files?.[0] ?? null"
+                                            @input="
+                                                form.logo =
+                                                    (
+                                                        $event.target as HTMLInputElement
+                                                    ).files?.[0] ?? null
+                                            "
                                         />
-                                        <InputError :message="form.errors.logo" />
+                                        <InputError
+                                            :message="form.errors.logo"
+                                        />
                                     </div>
 
                                     <div class="grid gap-3">
@@ -415,15 +491,26 @@ function revokePreview(value: string | null, original: string | null): void {
                                             id="cover"
                                             type="file"
                                             accept=".png,.jpg,.jpeg,.webp"
-                                            @input="form.cover = ($event.target as HTMLInputElement).files?.[0] ?? null"
+                                            @input="
+                                                form.cover =
+                                                    (
+                                                        $event.target as HTMLInputElement
+                                                    ).files?.[0] ?? null
+                                            "
                                         />
-                                        <InputError :message="form.errors.cover" />
+                                        <InputError
+                                            :message="form.errors.cover"
+                                        />
                                     </div>
                                 </section>
 
                                 <div class="flex items-center gap-4">
                                     <Button :disabled="form.processing">
-                                        {{ form.processing ? 'Saving...' : submitLabel }}
+                                        {{
+                                            form.processing
+                                                ? 'Saving...'
+                                                : submitLabel
+                                        }}
                                     </Button>
                                     <span class="text-sm text-muted-foreground">
                                         {{
@@ -438,16 +525,22 @@ function revokePreview(value: string | null, original: string | null): void {
                     </Card>
 
                     <div class="space-y-6">
-                        <Card class="rounded-[1.75rem] border-border/70 bg-stone-50/70">
+                        <Card
+                            class="rounded-[1.75rem] border-border/70 bg-stone-50/70"
+                        >
                             <CardHeader>
-                                <CardTitle class="text-lg">Visual preview</CardTitle>
+                                <CardTitle class="text-lg"
+                                    >Visual preview</CardTitle
+                                >
                                 <CardDescription>
                                     Current assets for the restaurant profile.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent class="space-y-4">
                                 <div class="space-y-2">
-                                    <p class="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                                    <p
+                                        class="text-xs font-medium tracking-[0.22em] text-muted-foreground uppercase"
+                                    >
                                         Cover
                                     </p>
                                     <div
@@ -463,13 +556,16 @@ function revokePreview(value: string | null, original: string | null): void {
                                             v-else
                                             class="flex h-full items-center justify-center px-6 text-center text-sm text-stone-300"
                                         >
-                                            Upload a cover image to define the public mood of the restaurant.
+                                            Upload a cover image to define the
+                                            public mood of the restaurant.
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="space-y-2">
-                                    <p class="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                                    <p
+                                        class="text-xs font-medium tracking-[0.22em] text-muted-foreground uppercase"
+                                    >
                                         Logo
                                     </p>
                                     <div
@@ -494,23 +590,43 @@ function revokePreview(value: string | null, original: string | null): void {
 
                         <Card class="rounded-[1.75rem] border-border/70">
                             <CardHeader>
-                                <CardTitle class="text-lg">Onboarding checklist</CardTitle>
+                                <CardTitle class="text-lg"
+                                    >Onboarding checklist</CardTitle
+                                >
                                 <CardDescription>
-                                    Keep the first pass lean. You can refine details later.
+                                    Keep the first pass lean. You can refine
+                                    details later.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent class="space-y-3 text-sm text-muted-foreground">
-                                <div class="flex gap-3 rounded-2xl border border-border/70 p-4">
-                                    <Check class="mt-0.5 h-4 w-4 text-emerald-600" />
-                                    Add the restaurant name and review the slug preview.
+                            <CardContent
+                                class="space-y-3 text-sm text-muted-foreground"
+                            >
+                                <div
+                                    class="flex gap-3 rounded-2xl border border-border/70 p-4"
+                                >
+                                    <Check
+                                        class="mt-0.5 h-4 w-4 text-emerald-600"
+                                    />
+                                    Add the restaurant name and review the slug
+                                    preview.
                                 </div>
-                                <div class="flex gap-3 rounded-2xl border border-border/70 p-4">
-                                    <Check class="mt-0.5 h-4 w-4 text-emerald-600" />
-                                    Set the core opening and closing times guests will rely on.
+                                <div
+                                    class="flex gap-3 rounded-2xl border border-border/70 p-4"
+                                >
+                                    <Check
+                                        class="mt-0.5 h-4 w-4 text-emerald-600"
+                                    />
+                                    Set the core opening and closing times
+                                    guests will rely on.
                                 </div>
-                                <div class="flex gap-3 rounded-2xl border border-border/70 p-4">
-                                    <Check class="mt-0.5 h-4 w-4 text-emerald-600" />
-                                    Upload visuals now or return later without losing access.
+                                <div
+                                    class="flex gap-3 rounded-2xl border border-border/70 p-4"
+                                >
+                                    <Check
+                                        class="mt-0.5 h-4 w-4 text-emerald-600"
+                                    />
+                                    Upload visuals now or return later without
+                                    losing access.
                                 </div>
                             </CardContent>
                         </Card>
