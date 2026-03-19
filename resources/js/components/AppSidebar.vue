@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, CalendarRange, FolderGit2, LayoutGrid, Salad, Store, Tags, UsersRound } from 'lucide-vue-next';
+import { BookOpen, CalendarRange, FolderGit2, LayoutGrid, QrCode, Salad, Store, Tags, UsersRound } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -52,6 +52,11 @@ const mainNavItems: NavItem[] = [
         title: 'Reservations',
         href: reservationsIndex(),
         icon: CalendarRange,
+    },
+    {
+        title: 'QR',
+        href: '/admin/qr',
+        icon: QrCode,
     },
 ];
 

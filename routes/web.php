@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
+use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\MagicOrderController;
 use App\Http\Controllers\PublicReservationController;
 use App\Http\Controllers\RestaurantMenuController;
@@ -58,6 +59,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->only(['index', 'edit', 'update']);
             Route::patch('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])
                 ->name('reservations.cancel');
+
+            Route::get('qr', QrController::class)->name('qr.index');
         });
     });
 });
