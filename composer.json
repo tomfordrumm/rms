@@ -1,11 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "rms/platform",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "RMS restaurant management platform.",
     "keywords": [
-        "laravel",
-        "framework"
+        "rms",
+        "restaurant-management",
+        "reservations",
+        "digital-menu"
     ],
     "license": "MIT",
     "require": {
