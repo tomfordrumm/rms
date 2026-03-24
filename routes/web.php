@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
 use App\Http\Controllers\Admin\QrController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MagicOrderController;
 use App\Http\Controllers\PublicReservationController;
 use App\Http\Controllers\RestaurantMenuController;
@@ -43,7 +44,7 @@ Route::controller(PublicReservationController::class)
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('restaurant.required')->group(function () {
-        Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
 
         Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('categories', CategoryController::class)
